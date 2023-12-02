@@ -75,11 +75,11 @@ merged = inner_join(waste, sightings,
 
 
 visualization
-```{r}
+```{r rat count over time by borough}
 
 merged$year_month <- factor(paste(merged$year, merged$month, sep = "-"))
 
-ggplot(merged, aes(x=month, y = ratcount, color = borough, group = interaction(year, borough))) + 
+rat_plot <- ggplot(merged, aes(x=month, y = ratcount, color = borough, group = interaction(year, borough))) + 
     geom_line() + 
     labs(title = "Total Rat Count by Borough",
          x = "Month",
@@ -87,6 +87,14 @@ ggplot(merged, aes(x=month, y = ratcount, color = borough, group = interaction(y
   facet_wrap(year ~ . )
 ```
 
+
+```{r refuse over time by borough}
+refuse_plot <- ggplot(merged, aes(x = month, y = total_refuse, color = borough, group = interaction(year, borough))) +
+    geom_point() + geom_line() +
+  theme(legend.position = "bottom") +
+  facet_wrap(year~.) +
+  scale_y_discrete(breaks = seq(10000,90000, by = 10000))
+```
 
 
 

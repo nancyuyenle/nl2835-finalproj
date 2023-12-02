@@ -2,7 +2,7 @@
 title: "p8105_fp_nl2835"
 author: "Nancy Le"
 date: '`r format(Sys.time(), "%Y-%m-%d")`'
-output: github_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -30,6 +30,7 @@ scale_fill_discrete = scale_fill_viridis_d
 
 
 library(dplyr)
+library(plotly)
 ```
 Looking into rat sighting v waste data
 
@@ -76,20 +77,18 @@ merged = inner_join(waste, sightings,
 
 visualization
 ```{r rat count over time by borough}
-
-merged$year_month <- factor(paste(merged$year, merged$month, sep = "-"))
-
-rat_plot <- ggplot(merged, aes(x=month, y = ratcount, color = borough, group = interaction(year, borough))) + 
+ggplot(merged, aes(x=month, y = ratcount, color = borough, group = interaction(year, borough))) + 
     geom_line() + 
     labs(title = "Total Rat Count by Borough",
          x = "Month",
          y = "Rat Count") +
   facet_wrap(year ~ . )
+
 ```
 
 
 ```{r refuse over time by borough}
-refuse_plot <- ggplot(merged, aes(x = month, y = total_refuse, color = borough, group = interaction(year, borough))) +
+ggplot(merged, aes(x = month, y = total_refuse, color = borough, group = interaction(year, borough))) +
     geom_point() + geom_line() +
   theme(legend.position = "bottom") +
   facet_wrap(year~.) +
@@ -97,6 +96,37 @@ refuse_plot <- ggplot(merged, aes(x = month, y = total_refuse, color = borough, 
 ```
 
 
+```{r plotly histogram for total_refuse}
+tr_ggplot = 
+  merged |> 
+  mutate(borough = fct_reorder(borough, total_refuse)) |> 
+  ggplot(aes(x = borough, y = total_refuse, fill = borough)) +
+  geom_boxplot() +
+  scale_y_discrete(breaks = seq(10000,90000, by = 10000)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggplotly(tr_ggplot)
+```
 
 
+```{r plotly histogram for total_paper}
+tp_ggplot = 
+  merged |> 
+  mutate(borough = fct_reorder(borough, total_paper)) |> 
+  ggplot(aes(x = borough, y = total_paper, fill = borough)) +
+  geom_boxplot() +
+  scale_y_discrete(breaks = seq(10000,90000, by = 10000)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggplotly(tp_ggplot)
+```
+
+```{r plotly barchart for total_refuse}
+merged |> 
+  mutate(borough = fct_reorder(borough, total_refuse)) |> 
+  plot_ly(x = ~borough, y = ~total_refuse, color = ~borough, type = "bar", colors = "viridis") 
+  
+```
+
+Need to plot multivariate graph
 
